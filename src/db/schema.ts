@@ -1,4 +1,6 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, serial, varchar, integer, jsonb, pgEnum } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { create } from "domain";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -61,4 +63,47 @@ export const verification = pgTable("verification", {
 });
 
 
-export const schema = { user, session, account, verification };
+// Campaign Status Enum
+export const campaignStatusEnum = pgEnum('campaign_status', ['Draft', 'Active', 'Paused', 'Completed']);
+
+// Lead Status Enum
+export const leadStatusEnum = pgEnum('lead_status', ['Pending', 'Contacted', 'Responded', 'Converted']);
+
+// Campaigns Table
+export const campaigns = pgTable('campaigns', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  status: campaignStatusEnum('status').notNull().default('Draft'),
+  totalLeads: integer('total_leads').notNull().default(0),
+  successfulLeads: integer('successful_leads').notNull().default(0),
+  responseRate: integer('response_rate').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+});
+
+// Leads Table
+export const leads = pgTable('leads', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  company: varchar('company', { length: 255 }),
+  campaignId: integer('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
+  status: leadStatusEnum('status').notNull().default('Pending'),
+  lastContactDate: timestamp('last_contact_date', { withTimezone: true }),
+  interactionHistory: jsonb('interaction_history').default([]),
+});
+
+// Relations
+export const campaignRelations = relations(campaigns, ({ many }) => ({
+  leads: many(leads),
+}));
+
+export const leadRelations = relations(leads, ({ one }) => ({
+  campaign: one(campaigns, { fields: [leads.campaignId], references: [campaigns.id] }),
+}));
+
+
+export type Lead = typeof leads.$inferSelect;
+
+
+export const schema = { user, session, account, verification, campaigns, leads };

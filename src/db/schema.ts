@@ -63,7 +63,7 @@ export const verification = pgTable("verification", {
 });
 
 
-// Campaign Status Enum
+// Campaign Status EnumA
 export const campaignStatusEnum = pgEnum('campaign_status', ['Draft', 'Active', 'Paused', 'Completed']);
 
 // Lead Status Enum
@@ -90,7 +90,7 @@ export const leads = pgTable('leads', {
   campaignId: integer('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
   status: leadStatusEnum('status').notNull().default('Pending'),
   lastContactDate: timestamp('last_contact_date', { withTimezone: true }),
-  interactionHistory: jsonb('interaction_history').default([]),
+  interactionHistory: text('interaction_history').array().default([]),
 });
 
 // Relations

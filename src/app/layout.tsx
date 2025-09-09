@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/providers/query-provider";
 
-
+import { GlobalLeadSheet } from "@/components/GlobalLeedSheet";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,6 +30,7 @@ export default function RootLayout({
       <body>
         <QueryProvider>
           {children}
+          <GlobalLeadSheet /> {/* ← Global sheet rendered here */}
         </QueryProvider>
         <Toaster />
       </body>

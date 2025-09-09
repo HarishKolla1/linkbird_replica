@@ -50,6 +50,20 @@
       "when": 1757331449354,
       "tag": "0006_plain_norman_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1757402573454,
+      "tag": "0007_fixed_mole_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1757403629623,
+      "tag": "0008_ancient_rawhide_kid",
+      "breakpoints": true
     }
   ]
 }

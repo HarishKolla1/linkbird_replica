@@ -157,10 +157,10 @@ export default function DashboardPage() {
                             <div className="flex justify-between items-center text-sm">
                               <p className="font-medium">{campaign.name}</p>
                               <p
-  className={`inline-block px-2 py-1 rounded text-sm font-medium text-center min-w-[100px] ${getCampaignStatusClasses(campaign.status)}`}
->
-  {campaign.status}
-</p>
+                                className={`inline-block px-2 py-1 rounded text-sm font-medium text-center min-w-[100px] ${getCampaignStatusClasses(campaign.status)}`}
+                              >
+                                {campaign.status}
+                              </p>
 
                             </div>
                           </a>

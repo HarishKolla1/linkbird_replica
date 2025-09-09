@@ -1,0 +1,1 @@
+ALTER TABLE "campaigns" RENAME COLUMN "responded" TO "pending";

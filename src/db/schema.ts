@@ -76,10 +76,12 @@ export const campaigns = pgTable('campaigns', {
   status: campaignStatusEnum('status').notNull().default('Draft'),
   totalLeads: integer('total_leads').notNull().default(0),
   successfulLeads: integer('successful_leads').notNull().default(0),
+  pending: integer('pending').notNull().default(0), // New column for pending leads
   responseRate: integer('response_rate').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   userId: varchar('user_id', { length: 255 }).notNull(),
 });
+
 
 // Leads Table
 export const leads = pgTable('leads', {

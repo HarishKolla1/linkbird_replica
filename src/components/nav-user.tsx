@@ -49,7 +49,18 @@ export function NavUser() {
     }
   };
 
-  if (!user) return null; // hide component if no user
+  // Show loading while session is being fetched
+  if (user === null) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <div className="p-2 text-sm text-muted-foreground">
+            Loading user...
+          </div>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
   return (
     <SidebarMenu>
@@ -64,7 +75,9 @@ export function NavUser() {
                 {user.avatar ? (
                   <AvatarImage src={user.avatar} alt={user.name} />
                 ) : (
-                  <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                  <AvatarFallback>
+                    {user.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
                 )}
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -87,7 +100,9 @@ export function NavUser() {
                   {user.avatar ? (
                     <AvatarImage src={user.avatar} alt={user.name} />
                   ) : (
-                    <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>
+                      {user.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
                   )}
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -123,7 +138,10 @@ export function NavUser() {
 
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Button className="bg-red-400 flex items-center gap-2" onClick={handleLogout}>
+              <Button
+                className="bg-red-400 flex items-center gap-2"
+                onClick={handleLogout}
+              >
                 <LogOut />
                 Log out
               </Button>

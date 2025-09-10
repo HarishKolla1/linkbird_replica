@@ -1,45 +1,36 @@
-"use client";
+"use client"
 
-import { useEffect, ReactNode } from "react";
-import { authClient } from "@/lib/auth-client";
-import { useSessionStore } from "@/store/sessionStore";
-
-type SessionData = {
-  user: {
-    name: string;
-    email: string;
-    image?: string | null;
-  };
-  session: {
-    id: string;
-    createdAt: string;
-    expiresAt: string;
-  };
-};
+import { useEffect, ReactNode } from "react"
+import { authClient } from "@/lib/auth-client"
+import { useSessionStore } from "@/store/sessionStore"
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const setUser = useSessionStore((state) => state.setUser);
-  const resetUser = useSessionStore((state) => state.reset);
+  const setUser = useSessionStore((state) => state.setUser)
+  const resetUser = useSessionStore((state) => state.reset)
 
   useEffect(() => {
     const fetchSession = async () => {
-      const data = await authClient.getSession();
+      try {
+        const res = await authClient.getSession()
 
-      // check if data is not an error and has 'user'
-      if (data && "user" in data && data.user) {
-        const user = data.user as { name: string; email: string; image?: string | null };
-        setUser({
-          name: user.name,
-          email: user.email,
-          avatar: user.image || "",
-        });
-      } else {
-        resetUser();
+        // ✅ BetterAuth wraps response in .data
+        if ("data" in res && res.data && res.data.user) {
+          const { user } = res.data
+          setUser({
+            name: user.name,
+            email: user.email,
+            avatar: user.image || "",
+          })
+        } else {
+          resetUser()
+        }
+      } catch (err) {
+        resetUser()
       }
-    };
+    }
 
-    fetchSession();
-  }, [setUser, resetUser]);
+    fetchSession()
+  }, [setUser, resetUser])
 
-  return <>{children}</>;
+  return <>{children}</>
 }

@@ -115,14 +115,7 @@ const CampaignDashboard = () => {
    // Session check + redirect
       const { data: session, isPending } = authClient.useSession();
 
-  useEffect(() => {
-    if (!isPending && !session) {
-      router.push('/authenticate'); // redirect to login if no session
-    }
-  }, [isPending, session, router]);
 
-  // Optionally show nothing while session is loading
-  if (isPending || !session) return null;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -142,6 +135,14 @@ const CampaignDashboard = () => {
   }, [observerTarget, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const allCampaigns = data?.pages.flatMap((page) => page.data) ?? [];
+    useEffect(() => {
+    if (!isPending && !session) {
+      router.push('/authenticate'); // redirect to login if no session
+    }
+  }, [isPending, session, router]);
+
+  // Optionally show nothing while session is loading
+  if (isPending || !session) return null;
 
   return (
     <div className="bg-gray-50 min-h-100px p-8 font-sans antialiased">

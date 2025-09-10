@@ -1,3 +1,6 @@
+"use client";
+
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -34,7 +37,7 @@ export default function CampaignSettingsPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="campaign-name">Campaign Name</Label>
-              <Input id="campaign-name" placeholder="Just Herbs" />
+              <Input id="campaign-name" placeholder="" />
             </div>
             <div className="flex items-center justify-between">
               <Label htmlFor="campaign-status">Campaign Status</Label>
@@ -59,7 +62,7 @@ export default function CampaignSettingsPage() {
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     <img src="/path-to-your-user-image.png" alt="Jivesh Lakhani" className="w-full h-full object-cover" />
                   </div>
-                  <span>Jivesh Lakhani</span>
+                  <span>Kolla Harish</span>
                 </div>
               </div>
             </div>

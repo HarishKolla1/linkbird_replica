@@ -1,20 +1,19 @@
-// store/sessionStore.ts
-import { create } from "zustand";
+import { create } from "zustand"
 
-interface User {
-  name: string;
-  email: string;
-  avatar?: string;
+type User = {
+  name: string
+  email: string
+  avatar?: string
+} | null
+
+type SessionStore = {
+  user: User
+  setUser: (user: User) => void
+  reset: () => void
 }
 
-interface SessionState {
-  user: User | null;
-  setUser: (user: User) => void;
-  reset: () => void;
-}
-
-export const useSessionStore = create<SessionState>((set) => ({
+export const useSessionStore = create<SessionStore>((set) => ({
   user: null,
   setUser: (user) => set({ user }),
   reset: () => set({ user: null }),
-}));
+}))

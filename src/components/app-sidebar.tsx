@@ -126,7 +126,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavAdmin projects={data.admin} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <NavUser  />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

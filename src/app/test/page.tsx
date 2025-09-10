@@ -1,41 +1,25 @@
-// "use client";
-// import { useParams } from "next/navigation";
-// import { useCampaignLeadsInfinite } from "@/hooks/useCampaignLeads";
+"use client"
 
-// export default function TestCampaignLeads() {
-//   const params = useParams();
-//   const campaignId = 1 // convert string | undefined to number
+import { useEffect, useState } from "react"
+import { authClient } from "@/lib/auth-client"
 
-//   if (!campaignId) return <div>Invalid campaign ID</div>; // handle missing ID
+export default function SessionTestPage() {
+  const [sessionData, setSessionData] = useState<any>(null)
 
-//   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-//     useCampaignLeadsInfinite(campaignId);
+  useEffect(() => {
+    const fetchSession = async () => {
+      const res = await authClient.getSession()
+      setSessionData(res)
+    }
+    fetchSession()
+  }, [])
 
-//   return (
-//     <div className="p-4">
-//       <h1 className="text-xl font-bold mb-4">Campaign Leads</h1>
-
-//       {status === "pending" && <p>Loading leads...</p>}
-//       {status === "error" && <p className="text-red-500">Error fetching leads</p>}
-
-//       <ul className="space-y-2">
-//         {data?.pages.flatMap((page) => page.recentLeads).map((lead) => (
-//           <li key={lead.id} className="p-2 border rounded">
-//             {lead.name} - {lead.company} ({lead.status})
-//           </li>
-//         ))}
-//       </ul>
-
-//       {isFetchingNextPage && <p>Loading more...</p>}
-
-//       {hasNextPage && (
-//         <button
-//           onClick={() => fetchNextPage()}
-//           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-//         >
-//           Load More
-//         </button>
-//       )}
-//     </div>
-//   );
-// }
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">🔎 Session Test</h1>
+      <pre className="bg-gray-900 text-white p-4 rounded-lg overflow-auto">
+        {JSON.stringify(sessionData, null, 2)}
+      </pre>
+    </div>
+  )
+}

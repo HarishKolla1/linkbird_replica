@@ -8,6 +8,10 @@ import { useCampaigns } from "@/hooks/useCampaignsInfinite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation"; // <-- For navigation
 
+
+import { authClient } from "@/lib/auth-client"; // <-- Import your auth client
+
+
 // --- Type for campaigns ---
 export interface Campaign {
   id: number;
@@ -108,6 +112,18 @@ const CampaignDashboard = () => {
   const observerTarget = useRef<HTMLTableRowElement | null>(null);
   const router = useRouter();
 
+   // Session check + redirect
+      const { data: session, isPending } = authClient.useSession();
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push('/authenticate'); // redirect to login if no session
+    }
+  }, [isPending, session, router]);
+
+  // Optionally show nothing while session is loading
+  if (isPending || !session) return null;
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -128,8 +144,8 @@ const CampaignDashboard = () => {
   const allCampaigns = data?.pages.flatMap((page) => page.data) ?? [];
 
   return (
-    <div className="bg-gray-50 min-h-screen p-8 font-sans antialiased">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="bg-gray-50 min-h-100px p-8 font-sans antialiased">
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div className="space-y-1">
@@ -142,7 +158,7 @@ const CampaignDashboard = () => {
         </div>
 
         {/* Tabs + Search */}
-        <div className="bg-white p-4 rounded-xl shadow-md">
+        <div className="bg-white p-2 rounded-xl shadow-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
             <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as typeof activeTab)} className="w-full">
               <TabsList>
@@ -173,71 +189,96 @@ const CampaignDashboard = () => {
         ) : (
           <Tabs value={activeTab} className="w-full">
             <TabsContent value="All Campaigns">
-              <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
+              <div className="bg-white rounded-xl shadow-md">
+                <table className="min-w-full divide-y divide-gray-200 table-fixed">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Campaign Name</th>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Leads</th>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Request Status</th>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Connection Status</th>
+                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-[25%]">Campaign Name</th>
+                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-[15%]">Status</th>
+                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-[15%]">Total Leads</th>
+                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-[30%]">Request Status</th>
+                      <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-[15%]">Connection Status</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {allCampaigns.map((campaign) => {
-                      const failed = Math.max(
-                        (campaign.totalLeads ?? 0) - (campaign.successfulLeads ?? 0) - (campaign.responded ?? 0),
-                        0
-                      );
-
-                      return (
-                        <tr
-                          key={campaign.id}
-                          className="hover:bg-gray-50 cursor-pointer"
-                          onClick={() => router.push(`campaigns/${campaign.id}`)}
-                        >
-                          <td className="px-6 py-4 text-center text-sm font-medium text-gray-900">{campaign.name}</td>
-                          <td className="px-6 py-4 text-center text-sm">
-                            <span
-                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                campaign.status === "Active"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {campaign.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-center text-sm text-gray-500">{campaign.totalLeads}</td>
-                          <td className="px-6 py-4 text-center text-sm text-gray-500">
-                            <div className="flex justify-center gap-4">
-                              <div className="flex items-center gap-1 text-green-500">
-                                <div className="w-4 h-4">{icons.check}</div>
-                                <span>{campaign.successfulLeads ?? 0}</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-yellow-500">
-                                <div className="w-4 h-4">{icons.comments}</div>
-                                <span>{campaign.responded ?? 0}</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-red-500">
-                                <div className="w-4 h-4">{icons.link}</div>
-                                <span>{failed}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-center text-sm text-gray-500">—</td>
-                        </tr>
-                      );
-                    })}
-                    <tr ref={observerTarget} className="h-1" aria-hidden="true" />
-                  </tbody>
                 </table>
+                <div className="overflow-y-auto h-[350px]">
+                  <table className="min-w-full divide-y divide-gray-200 table-fixed">
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {allCampaigns.map((campaign) => {
+                        const failed = Math.max(
+                          (campaign.totalLeads ?? 0) - (campaign.successfulLeads ?? 0) - (campaign.responded ?? 0),
+                          0
+                        );
 
-                {isFetchingNextPage && <div className="text-center py-4 text-gray-500">Loading more campaigns...</div>}
-                {!hasNextPage && allCampaigns.length > 0 && (
-                  <div className="text-center py-4 text-gray-500">You have reached the end.</div>
-                )}
+                        return (
+                          <tr
+                            key={campaign.id}
+                            className="hover:bg-gray-50 cursor-pointer"
+                            onClick={() => router.push(`campaigns/${campaign.id}`)}
+                          >
+                            <td className="px-6 py-4 text-center text-sm font-medium text-gray-900 w-[25%]">{campaign.name}</td>
+                            <td className="px-6 py-4 text-center text-sm w-[15%]">
+                              <span
+                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                  campaign.status === "Active"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {campaign.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-center text-sm text-gray-500 w-[15%]">{campaign.totalLeads}</td>
+                            <td className="px-6 py-4 text-center text-sm text-gray-500 w-[30%]">
+                              <div className="flex justify-center gap-4">
+                                <div className="flex items-center gap-1 text-green-500">
+                                  <div className="w-4 h-4">{icons.check}</div>
+                                  <span>{campaign.successfulLeads ?? 0}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-yellow-500">
+                                  <div className="w-4 h-4">{icons.comments}</div>
+                                  <span>{campaign.responded ?? 0}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-red-500">
+                                  <div className="w-4 h-4">{icons.link}</div>
+                                  <span>{failed}</span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-center text-sm text-gray-500 w-[15%]">—</td>
+                          </tr>
+                        );
+                      })}
+                      <tr ref={observerTarget} className="h-1" aria-hidden="true" />
+                    </tbody>
+                  </table>
+                </div>
+
+                 {isFetchingNextPage && (
+                <div className="flex items-center justify-center gap-2 mt-2 text-gray-500 text-sm">
+                  <svg
+                    className="animate-spin h-4 w-4 text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v2a6 6 0 00-6 6H4z"
+                    ></path>
+                  </svg>
+                  <span>Loading more...</span>
+                </div>
+              )}
               </div>
             </TabsContent>
 

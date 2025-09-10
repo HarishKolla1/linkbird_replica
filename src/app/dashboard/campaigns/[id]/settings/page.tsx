@@ -3,8 +3,21 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function CampaignSettingsPage() {
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push('/authenticate'); // Redirect to login if no session
+    }
+  }, [isPending, session, router]);
+
+  if (isPending || !session) return null; 
   return (
     <div className="flex justify-center  bg-gray-50 min-h-screen">
       <div className="w-full space-y-6">

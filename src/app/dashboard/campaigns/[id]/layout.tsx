@@ -11,17 +11,15 @@ export default function CampaignDetailsLayout({
   children: ReactNode;
   params: { id: string };
 }) {
-  const campaignId = params.id;
+  const campaignId = params?.id ?? ''; // fallback just in case
+
   return (
     <div className="p-6">
-      {/* Main Campaign Header */}
       <div className="flex items-center space-x-4 mb-4">
         <h1 className="text-3xl font-bold">Campaign Details</h1>
-        {/* The campaign name will be fetched here using the ID */}
       </div>
       <Separator className="my-4" />
 
-      {/* Sub-navigation Tabs */}
       <div className="flex justify-between items-center">
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>

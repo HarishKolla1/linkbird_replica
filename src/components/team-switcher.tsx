@@ -44,9 +44,11 @@ export function TeamSwitcher({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
+              {/* This div replaces the logo and displays the plan's initials */}
+              <div className="flex size-8 items-center justify-center rounded-full bg-slate-400 text-sm font-semibold text-white">
+                {activeTeam.plan.substring(0, 2).toUpperCase()}
               </div>
+
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{activeTeam.name}</span>
                 <span className="truncate text-xs">{activeTeam.plan}</span>
@@ -69,9 +71,11 @@ export function TeamSwitcher({
                 onClick={() => setActiveTeam(team)}
                 className="gap-2 p-2"
               >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-3.5 shrink-0" />
+                {/* This div also replaces the logo in the dropdown menu */}
+                <div className="flex size-10 items-center justify-center rounded-full bg-slate-400 text-xs font-semibold text-white">
+                  {team.plan.substring(0, 2).toUpperCase()}
                 </div>
+
                 {team.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>

@@ -19,6 +19,7 @@ import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
+import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +27,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { NavAdmin } from "./nav-admin"
 
 // Sample data
 const data = {
@@ -36,9 +38,9 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "Kandid",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "Personal",
     },
     {
       name: "Acme Corp.",
@@ -86,6 +88,18 @@ const data = {
       icon: Frame,
     },
   ],
+  admin: [
+    {
+      name: "Activity logs",
+      url: "#",
+      icon: Frame,
+    },
+    {
+      name: "User logs",
+      url: "#",
+      icon: Frame,
+    },
+  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -93,23 +107,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         {/* Company Logo */}
-        <div className="flex items-center justify-center gap-2 py-4">
+        <div className="flex items-center justify-center gap-2 py-2">
           <Image
             src="/linkbird-light-logo.svg"
             alt="Company Logo"
-            width={40}
-            height={40}
+            width={130}
+            height={60}
             className="rounded-md"
           />
         </div>
+        <Separator />
+
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.settings} />
+        <NavAdmin projects={data.admin} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

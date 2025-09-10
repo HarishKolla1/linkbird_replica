@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 const App = () => {
+
+  const { data: session, isPending } = authClient.useSession();
+    const router = useRouter();
+  
+    useEffect(() => {
+      if (!isPending && !session) {
+        router.push('/authenticate'); // Redirect to login if no session
+      }
+    }, [isPending, session, router]);
+  
+    if (isPending || !session) return null; //
   const [message, setMessage] = useState<string>("");
   const [connectionMessage, setConnectionMessage] = useState<string>("");
   const [followUp1, setFollowUp1] = useState<string>("");

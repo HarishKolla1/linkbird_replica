@@ -3,8 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/providers/query-provider";
-
+import { SessionProvider } from "@/providers/session-provider"; // import SessionProvider
 import { GlobalLeadSheet } from "@/components/GlobalLeedSheet";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,8 +30,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <QueryProvider>
-          {children}
-          <GlobalLeadSheet /> {/* ← Global sheet rendered here */}
+          <SessionProvider>
+            {children}
+            <GlobalLeadSheet /> {/* ← Global sheet rendered here */}
+          </SessionProvider>
         </QueryProvider>
         <Toaster />
       </body>

@@ -1,10 +1,22 @@
 // src/app/dashboard/campaigns/[id]/page.tsx
 "use client";
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { authClient } from '@/lib/auth-client';
+import { useEffect } from 'react';
 
 export default function CampaignOverviewPage() {
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push('/authenticate'); // Redirect to login if no session
+    }
+  }, [isPending, session, router]);
+
+  if (isPending || !session) return null; //
   const params = useParams();
   const campaignId = params.id;
 

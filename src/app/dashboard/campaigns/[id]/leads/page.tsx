@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useCallback, useEffect, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -13,6 +13,8 @@ import {
 import { useCampaignLeadsInfinite } from "@/hooks/useCampaignLeads";
 import { useLeadsTableStore, SortBy, SortOrder } from "@/store/leadsTableStore";
 import { cn } from "@/lib/utils";
+import { useLeadSheetStore } from "@/store/leadSheetStore"; // ⬅️ import the sheet store
+import { authClient } from "@/lib/auth-client";
 
 const statusColors: Record<string, string> = {
   "Follow Up": "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -26,15 +28,25 @@ const statusToBars: Record<string, number> = {
   "Sent": 2,
   "Follow Up": 3,
   "Pending": 1,
-  "Responded": 2, // treat like Sent
+  "Responded": 2,
   "Pending Approval": 1,
 };
 
-
 export default function CampaignLeadsPage() {
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push('/authenticate'); // Redirect to login if no session
+    }
+  }, [isPending, session, router]);
+
+  if (isPending || !session) return null; //
   const params = useParams();
   const campaignId = Number(params.id);
   const { sortBy, sortOrder, setSorting } = useLeadsTableStore();
+  const setLead = useLeadSheetStore((state) => state.setLead); // ⬅️ store action
 
   if (!campaignId) return <div>Invalid campaign ID</div>;
 
@@ -58,8 +70,8 @@ export default function CampaignLeadsPage() {
   );
 
   const allLeads =
-    data?.pages.flatMap(page =>
-      page.map(item => ({
+    data?.pages.flatMap((page) =>
+      page.map((item) => ({
         ...item.leads,
         campaign: item.campaigns,
       }))
@@ -69,6 +81,11 @@ export default function CampaignLeadsPage() {
     const newOrder: SortOrder =
       sortBy === col && sortOrder === "asc" ? "desc" : "asc";
     setSorting(col, newOrder);
+  };
+
+  const getSortIcon = (col: SortBy) => {
+    if (sortBy !== col) return null;
+    return sortOrder === "asc" ? "↑" : "↓";
   };
 
   return (
@@ -81,23 +98,20 @@ export default function CampaignLeadsPage() {
                 onClick={() => handleSort("name")}
                 className="cursor-pointer w-[25%]"
               >
-                Name {sortBy === "name" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                Name {getSortIcon("name")}
               </TableHead>
-              <TableHead className="w-[25%]">
-                Lead Description
-              </TableHead>
-
+              <TableHead className="w-[25%]">Lead Description</TableHead>
               <TableHead
                 onClick={() => handleSort("status")}
                 className="cursor-pointer w-[25%]"
               >
-                Activity {sortBy === "status" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                Activity {getSortIcon("status")}
               </TableHead>
               <TableHead
                 onClick={() => handleSort("lastContactDate")}
                 className="cursor-pointer w-[25%]"
               >
-                Status {sortBy === "lastContactDate" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                Status {getSortIcon("lastContactDate")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -121,21 +135,24 @@ export default function CampaignLeadsPage() {
               const initials = lead.name?.[0]?.toUpperCase() || "U";
 
               return (
-                <TableRow key={lead.id} ref={isLast ? lastRowRef : null} className="hover:bg-gray-50">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">
-                      {initials}
+                <TableRow
+                  key={lead.id}
+                  ref={isLast ? lastRowRef : null}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setLead(lead)} // ⬅️ clicking opens sheet
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">
+                        {initials}
+                      </div>
+                      <div>
+                        <p className="font-medium">{lead.name}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{lead.name}</p>
-                    </div>
-                  </div>
-                </TableCell>
+                  </TableCell>
 
-                <TableCell className="align-middle">
-                  {lead.company}
-                </TableCell>
+                  <TableCell className="align-middle">{lead.company}</TableCell>
 
                   <TableCell>
                     <div className="flex items-center gap-1 h-10">
@@ -143,12 +160,13 @@ export default function CampaignLeadsPage() {
                         <div
                           key={i}
                           className={cn(
-                            "w-2 h-full rounded-sm",
-                            i < (statusToBars[lead.status] || 0) ? "bg-green-500" : "bg-gray-200"
+                            "w-1 h-6 rounded-sm",
+                            i < (statusToBars[lead.status] || 0)
+                              ? "bg-green-500"
+                              : "bg-gray-200"
                           )}
                         />
                       ))}
-
                     </div>
                   </TableCell>
 
@@ -156,7 +174,8 @@ export default function CampaignLeadsPage() {
                     <span
                       className={cn(
                         "px-2 py-1 text-xs font-medium rounded-md border",
-                        statusColors[lead.status.split(" ")[0]] || statusColors["No Status"]
+                        statusColors[lead.status.split(" ")[0]] ||
+                          statusColors["No Status"]
                       )}
                     >
                       {lead.status}

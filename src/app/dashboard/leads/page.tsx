@@ -71,8 +71,6 @@ export default function LeadsPage() {
       router.push('/authenticate'); // Redirect to login if no session
     }
   }, [isPending, session, router]);
-
-  if (isPending || !session) return null; //
   const { sortBy, sortOrder, setSorting } = useLeadsTableStore();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useLeadsInfinite();
   const { setLead } = useLeadSheetStore();
@@ -99,6 +97,8 @@ export default function LeadsPage() {
     const newOrder: SortOrder = sortBy === col && sortOrder === "asc" ? "desc" : "asc";
     setSorting(col, newOrder);
   };
+
+    if (isPending || !session) return null; //
 
   return (
     <div className="p-6">

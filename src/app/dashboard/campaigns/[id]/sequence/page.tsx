@@ -20,7 +20,7 @@ const App = () => {
       }
     }, [isPending, session, router]);
   
-    if (isPending || !session) return null; //
+    
   const [message, setMessage] = useState<string>("");
   const [connectionMessage, setConnectionMessage] = useState<string>("");
   const [followUp1, setFollowUp1] = useState<string>("");
@@ -47,6 +47,7 @@ const App = () => {
   const handleSave = (content: string) => {
     console.log("Saved content:", content);
   };
+
 
   // --- Message Editor Component ---
   const MessageEditor = ({
@@ -141,6 +142,8 @@ const App = () => {
       </AccordionContent>
     </AccordionItem>
   );
+
+  if (isPending || !session) return null; //
 
   return (
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans">

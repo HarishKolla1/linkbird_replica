@@ -42,7 +42,7 @@ export default function CampaignLeadsPage() {
     }
   }, [isPending, session, router]);
 
-  if (isPending || !session) return null; //
+  
   const params = useParams();
   const campaignId = Number(params.id);
   const { sortBy, sortOrder, setSorting } = useLeadsTableStore();
@@ -87,6 +87,8 @@ export default function CampaignLeadsPage() {
     if (sortBy !== col) return null;
     return sortOrder === "asc" ? "↑" : "↓";
   };
+
+  if (isPending || !session) return null;
 
   return (
     <div className="p-6">

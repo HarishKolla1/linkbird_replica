@@ -16,7 +16,6 @@ export default function CampaignOverviewPage() {
     }
   }, [isPending, session, router]);
 
-  if (isPending || !session) return null; //
   const params = useParams();
   const campaignId = params.id;
 
@@ -35,6 +34,8 @@ export default function CampaignOverviewPage() {
   if (status === 'error') {
     return <div>Error loading campaign details.</div>;
   }
+
+    if (isPending || !session) return null; //
 
   return (
     <div className="p-4">
